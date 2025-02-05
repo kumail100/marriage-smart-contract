@@ -1,0 +1,148 @@
+// BSV Smart Contract
+contract MarriageContract {
+    // Contract participants (addresses)
+    var partyA: sigaddress
+    var partyB: sigaddress
+    
+    // Contract terms
+    var startDate: int
+    var endDate: int
+    var renewalTerm: int  // in seconds (e.g., 365 days = 365*24*60*60)
+    var isActive: bool
+    
+    // Financial Contributions
+    var financialContributionsA: int
+    var financialContributionsB: int
+
+    // Vesting Schedule and milestones
+    var milestonesAchievedA: int
+    var milestonesAchievedB: int
+    var vestingSchedule: int // percentage of coin unlocked based on milestones (0-100%)
+    
+    // Tokenized Investment tracking
+    var investorBalance: map<sigaddress, int>  // Track how much each investor has invested
+
+    // Contract agreement (example)
+    var agreementClause: string
+
+    // Third-Party Oracle (Placeholder)
+    var verificationOracle: sigaddress
+
+    // Events
+    event ContractCreated(partyA: sigaddress, partyB: sigaddress, startDate: int, endDate: int)
+    event ContractRenewed(partyA: sigaddress, partyB: sigaddress, newEndDate: int)
+    event GoalAchieved(party: sigaddress, progress: int)
+    event TokenInvested(investor: sigaddress, amount: int)
+    event ContractExited(party: sigaddress)
+
+    // Contract constructor
+    constructor(_partyA: sigaddress, _partyB: sigaddress, _startDate: int, _renewalTerm: int) {
+        partyA = _partyA
+        partyB = _partyB
+        startDate = _startDate
+        renewalTerm = _renewalTerm
+        endDate = _startDate + _renewalTerm
+        isActive = true
+        financialContributionsA = 0
+        financialContributionsB = 0
+        milestonesAchievedA = 0
+        milestonesAchievedB = 0
+        vestingSchedule = 0
+        agreementClause = "Default agreement terms..."
+        verificationOracle = null
+        emit ContractCreated(partyA, partyB, startDate, endDate)
+    }
+
+    // Verify participants (call third-party Oracle for KYC validation)
+    public function verifyParticipants() {
+        assert(verificationOracle != null, "Verification oracle not set")
+        
+        var isVerifiedA = verify(partyA)
+        var isVerifiedB = verify(partyB)
+        
+        assert(isVerifiedA && isVerifiedB, "Both participants must be verified")
+    }
+
+    // Placeholder function to simulate verification
+    private function verify(participant: sigaddress): bool {
+        // Simulate a check, would use Oracle in real-world
+        return true // Assume always verified
+    }
+
+    // Set financial contribution by either party (can be changed by contract participants)
+    public function setFinancialContribution(amount: int, isPartyA: bool) {
+        if (isPartyA) {
+            financialContributionsA += amount
+        } else {
+            financialContributionsB += amount
+        }
+    }
+
+    // Set milestone progress for each participant
+    public function setMilestoneProgress(progress: int, isPartyA: bool) {
+        if (isPartyA) {
+            milestonesAchievedA += progress
+        } else {
+            milestonesAchievedB += progress
+        }
+        
+        // Unlock tokens if milestone threshold is met
+        if (milestonesAchievedA >= 100) {
+            vestCoins(partyA)
+        }
+        
+        if (milestonesAchievedB >= 100) {
+            vestCoins(partyB)
+        }
+        
+        emit GoalAchieved(isPartyA ? partyA : partyB, progress)
+    }
+
+    // Function to vest tokens (simple mock-up)
+    private function vestCoins(participant: sigaddress) {
+        // Simulate the process of minting or unlocking coins
+        var mintedAmount = 100 // Example value
+        // Here you could integrate the actual token minting logic
+        // This would interact with a tokenized system to issue the coins
+        emit TokenInvested(participant, mintedAmount)
+    }
+
+    // Allow investors to invest in the contract
+    public function invest(investor: sigaddress, amount: int) {
+        // Track investor's balance
+        investorBalance[investor] += amount
+        emit TokenInvested(investor, amount)
+    }
+
+    // Renew contract automatically
+    public function renewContract() {
+        assert(isActive, "Contract is not active")
+        assert(block.timestamp >= endDate, "Contract cannot be renewed before expiration")
+        
+        // Renew contract for another term
+        endDate = block.timestamp + renewalTerm
+        emit ContractRenewed(partyA, partyB, endDate)
+    }
+
+    // Exit contract (terminate)
+    public function exitContract() {
+        isActive = false
+        emit ContractExited(partyA)
+        emit ContractExited(partyB)
+    }
+
+    // Function to check if the contract is still active
+    public function isContractActive() : bool {
+        return isActive
+    }
+
+    // Additional function to get contract details
+    public function getContractDetails() : string {
+        return agreementClause
+    }
+
+    // Set the agreement clause
+    public function setAgreementClause(newClause: string) {
+        agreementClause = newClause
+    }
+}
