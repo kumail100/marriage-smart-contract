@@ -14,3 +14,31 @@ Contract duration: Start date, end date, and renewal term
 Milestones and Vesting: Each party can meet milestones and unlock tokens based on progress
 Verification: Using a simple check for KYC (this would be a placeholder for an actual verification oracle in a real implementation)
 Investments: Investors can invest in the contract and receive a share based on the contract's goals.
+
+Explanation of Key Components
+Participants (partyA, partyB):
+These are the two addresses involved in the contract. Each address represents one party.
+Contract Terms:
+startDate, endDate, and renewalTerm control when the contract starts and ends. The renewal term is in seconds (e.g., 365 days = 365 * 24 * 60 * 60).
+Financial Contributions:
+Both participants can set their financial contributions, and these are tracked individually (financialContributionsA, financialContributionsB).
+Milestones:
+Each participant can contribute to milestones (milestonesAchievedA, milestonesAchievedB). When a milestone is met, coins are unlocked based on the vesting schedule.
+Vesting Mechanism:
+When a participant achieves a milestone, they unlock a portion of their coins. This is just a mock implementation (vestCoins).
+Investors:
+External investors can invest in the contract. Their investments are tracked with a mapping (investorBalance), and they receive rewards based on their investment.
+Third-Party Verification:
+A placeholder verify function is used to simulate KYC verification. In a real-world scenario, an oracle service would be used to verify the identities of both parties.
+Exit Function:
+The exitContract function allows either party to exit the contract, deactivating it.
+Contract Renewal:
+The contract can be renewed automatically when it reaches its end date.
+Agreement Clause:
+The contract can contain terms and conditions stored in the agreementClause string. This could be updated at any time.
+Next Steps
+Token Minting: The smart contract assumes token minting would be integrated with a separate token system (Tokenized Protocol or similar).
+Real-World Oracle Integration: A real-world Oracle (e.g., for KYC or external verification) can be integrated.
+Security & Testing: Full security audits should be conducted on the contract before any real use.
+Legal Review: Ensure that all contract terms are legally sound and compliant.
+This is just a starting point and demonstrates how you can integrate various aspects like verification, milestones, vesting, and external investments into a smart contract using sCrypt.
